@@ -160,13 +160,13 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        Log.d(TAG, "started application");
+        Log.d(TAG, "started activity");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
-        Log.d(TAG, "stopped application");
+        Log.d(TAG, "stopped activity");
     }
 }

@@ -24,10 +24,23 @@ public class DeviceActivity extends Activity {
         Log.d(TAG, "started activity for " + address);
         logWindow = (EditText) findViewById(R.id.deviceLog);
         connectToDevice();
-
     }
 
     private void connectToDevice() {
         EventBus.getDefault().post(new DeviceConnectRequest(address));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+        Log.d(TAG, "started activity");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+        Log.d(TAG, "stopped activity");
     }
 }
