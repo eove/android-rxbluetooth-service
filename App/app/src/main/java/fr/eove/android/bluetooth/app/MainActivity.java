@@ -20,7 +20,7 @@ import fr.eove.android.bluetooth.service.events.DiscoveryCancelRequest;
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = "Bluetooth App";
+    private static final String TAG = "App";
     private Button startDiscoveryButton;
     private Button stopDiscoveryButton;
 

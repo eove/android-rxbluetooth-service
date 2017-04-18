@@ -31,7 +31,7 @@ import io.reactivex.functions.Consumer;
 
 public class BluetoothService extends Service {
 
-    private static final String TAG = "BluetoothService";
+    private static final String TAG = "Service";
     private BluetoothAdapter bluetoothAdapter;
     private CompositeDisposable disposables = new CompositeDisposable();
     private List<BluetoothDevice> devices = new ArrayList<>();
