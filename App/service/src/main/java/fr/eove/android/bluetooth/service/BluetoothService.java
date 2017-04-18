@@ -13,6 +13,7 @@ import android.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
@@ -21,6 +22,7 @@ public class BluetoothService extends Service {
     private static final String TAG = "BluetoothService";
     private BluetoothAdapter bluetoothAdapter;
     Disposable deviceDisposables;
+    CompositeDisposable disposables;
 
     public BluetoothService() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -36,14 +38,21 @@ public class BluetoothService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "started service");
-        deviceDisposables = observeDevices().subscribe(new Consumer<BluetoothDevice>() {
+        disposables.add(observeDevices().subscribe(new Consumer<BluetoothDevice>() {
             @Override
             public void accept(BluetoothDevice bluetoothDevice) throws Exception {
                 Log.d(TAG, "Found device: " + bluetoothDevice.getAddress());
             }
-        });
+        }));
         startDiscovery();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        disposables.dispose();
+    }
+
     public boolean startDiscovery() {
         return bluetoothAdapter.startDiscovery();
     }
