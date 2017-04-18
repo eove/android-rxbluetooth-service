@@ -100,7 +100,7 @@ public class BluetoothService extends Service {
         if (connectedDeviceDisposable != null) {
             connectedDeviceDisposable.dispose();
         }
-        observeConnectedDevice(bluetoothAdapter.getRemoteDevice(event.address), MY_UUID)
+        connectedDeviceDisposable = observeConnectedDevice(bluetoothAdapter.getRemoteDevice(event.address), MY_UUID)
                             .map(new Function<BluetoothSocket, BluetoothConnection>() {
                                 @Override
                                 public BluetoothConnection apply(BluetoothSocket bluetoothSocket) throws Exception {
@@ -120,6 +120,7 @@ public class BluetoothService extends Service {
                                     Log.d(TAG, "recv: " + recv);
                                 }
                             });
+        disposables.add(connectedDeviceDisposable);
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
