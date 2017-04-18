@@ -5,11 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.eove.android.bluetooth.service.BluetoothService;
 import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
@@ -23,6 +33,7 @@ public class MainActivity extends Activity {
     private static final String TAG = "App";
     private Button startDiscoveryButton;
     private Button stopDiscoveryButton;
+    private List<String> deviceAddresses = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +45,7 @@ public class MainActivity extends Activity {
         startDiscoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                deviceAddresses.clear();
                 startDiscovery();
             }
         });
@@ -48,6 +60,50 @@ public class MainActivity extends Activity {
         });
         stopDiscoveryButton.setEnabled(false);
 
+        ListView list =  (ListView) findViewById(R.id.deviceListView);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String address = deviceAddresses.get(position);
+                if (address != null) {
+                    startActivityForDevice(address);
+                } else {
+                    Toast.makeText(MainActivity.this, "Could not open device window", Toast.LENGTH_LONG);
+                }
+            }
+        });
+
+        ArrayAdapter<String> adapter = new DeviceListAdapter();
+        list.setAdapter(adapter);
+    }
+
+    private class DeviceListAdapter extends ArrayAdapter<String> {
+
+        public DeviceListAdapter() {
+            super(MainActivity.this, R.layout.item_view, deviceAddresses);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View itemView = convertView;
+            if (itemView == null) {
+                itemView = getLayoutInflater().inflate(R.layout.item_view, parent, false);
+            }
+
+            String address = deviceAddresses.get(position);
+
+            TextView textView = (TextView) itemView.findViewById(R.id.item_name);
+            textView.setText(address);
+
+            return itemView;
+        }
+    }
+
+    private void startActivityForDevice(String address) {
+        Intent i = new Intent(this, DeviceActivity.class);
+        i.putExtra("address", address);
+        startActivity(i);
     }
 
     private void startBluetoothService() {
@@ -57,6 +113,7 @@ public class MainActivity extends Activity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDiscoveredDeviceEvent(DiscoveredDeviceEvent event) {
+        deviceAddresses.add(event.address);
         Log.d(TAG, "Found device with address " + event.address);
     }
 

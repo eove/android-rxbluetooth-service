@@ -22,7 +22,9 @@
         <service
             android:name="fr.eove.android.bluetooth.service.BluetoothService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity android:name=".DeviceActivity"></activity>
     </application>
 
 </manifest>
