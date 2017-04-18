@@ -15,8 +15,13 @@ android {
     }
     buildTypes {
         release {
+            buildConfigField "String", "PAIR_KEY", "\"3250\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            buildConfigField "String", "PAIR_KEY", "\"3250\""
         }
     }
 }

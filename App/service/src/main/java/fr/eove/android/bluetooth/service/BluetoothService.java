@@ -61,8 +61,7 @@ public class BluetoothService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        EventBus.getDefault().register(this);
-        Log.d(TAG, "started service");
+
         disposables.add(observeDevices().subscribe(new Consumer<BluetoothDevice>() {
             @Override
             public void accept(BluetoothDevice bluetoothDevice) throws Exception {
@@ -86,6 +85,18 @@ public class BluetoothService extends Service {
                 }
             }
         }));
+
+        disposables.add(observePairing().subscribe(new Consumer<BluetoothDevice>() {
+            @Override
+            public void accept(BluetoothDevice bluetoothDevice) throws Exception {
+                String address = bluetoothDevice.getAddress();
+                String name = bluetoothDevice.getName();
+                Log.d(TAG, "paired with device: " + name + " (" + address + ")");
+            }
+        }));
+
+        EventBus.getDefault().register(this);
+        Log.d(TAG, "started service");
     }
 
     @Override
@@ -170,6 +181,33 @@ public class BluetoothService extends Service {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         e.onNext(intent.getAction());
+                    }
+                };
+                BluetoothService.this.registerReceiver(receiver, filter);
+            }
+        });
+    }
+
+    public Observable<BluetoothDevice> observePairing() {
+        final  IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+
+        return Observable.create(new ObservableOnSubscribe<BluetoothDevice>() {
+            @Override
+            public void subscribe(final ObservableEmitter<BluetoothDevice> e) throws Exception {
+                final BroadcastReceiver receiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                        byte[] pinBytes = BuildConfig.PAIR_KEY.getBytes();
+                        try {
+                            device.setPin(pinBytes);
+                            device.setPairingConfirmation(false);
+                            device.createBond();
+                            e.onNext(device);
+                        } catch (Exception error) {
+                            e.onError(error);
+                        }
                     }
                 };
                 BluetoothService.this.registerReceiver(receiver, filter);
