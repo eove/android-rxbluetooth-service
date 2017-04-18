@@ -30,11 +30,11 @@ import fr.eove.android.bluetooth.service.events.DiscoveryCancelRequest;
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = "App";
+    private static final String TAG = "App/DeviceList";
     private Button startDiscoveryButton;
     private Button stopDiscoveryButton;
-    private List<String> deviceAddresses = new ArrayList<>();
-    ArrayAdapter<String> deviceListAdapter;
+    private List<Device> devices = new ArrayList<>();
+    ArrayAdapter<Device> deviceListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         startDiscoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deviceAddresses.clear();
+                devices.clear();
                 startDiscovery();
             }
         });
@@ -65,11 +65,11 @@ public class MainActivity extends Activity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String address = deviceAddresses.get(position);
-                if (address != null) {
-                    startActivityForDevice(address);
+                Device dev = devices.get(position);
+                if (dev != null) {
+                    startActivityForDevice(dev);
                 } else {
-                    Toast.makeText(MainActivity.this, "Could not open device window", Toast.LENGTH_LONG);
+                    Toast.makeText(MainActivity.this, "Could not open device activity", Toast.LENGTH_LONG);
                 }
             }
         });
@@ -78,10 +78,10 @@ public class MainActivity extends Activity {
         list.setAdapter(deviceListAdapter);
     }
 
-    private class DeviceListAdapter extends ArrayAdapter<String> {
+    private class DeviceListAdapter extends ArrayAdapter<Device> {
 
         public DeviceListAdapter() {
-            super(MainActivity.this, R.layout.item_view, deviceAddresses);
+            super(MainActivity.this, R.layout.item_view, devices);
         }
 
         @Override
@@ -92,18 +92,19 @@ public class MainActivity extends Activity {
                 itemView = getLayoutInflater().inflate(R.layout.item_view, parent, false);
             }
 
-            String address = deviceAddresses.get(position);
+            Device dev = devices.get(position);
 
             TextView textView = (TextView) itemView.findViewById(R.id.item_name);
-            textView.setText(address);
+            textView.setText(dev.name + " (" + dev.address + ")");
 
             return itemView;
         }
     }
 
-    private void startActivityForDevice(String address) {
+    private void startActivityForDevice(Device dev) {
         Intent i = new Intent(this, DeviceActivity.class);
-        i.putExtra("address", address);
+        i.putExtra("address", dev.address);
+        i.putExtra("name", dev.name);
         startActivity(i);
     }
 
@@ -114,7 +115,7 @@ public class MainActivity extends Activity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDiscoveredDeviceEvent(DiscoveredDeviceEvent event) {
-        deviceAddresses.add(event.address);
+        devices.add(new Device(event.address, event.name));
         deviceListAdapter.notifyDataSetChanged();
         Log.d(TAG, "Found device with address " + event.address);
 

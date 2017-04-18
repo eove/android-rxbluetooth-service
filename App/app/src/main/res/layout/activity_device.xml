@@ -6,4 +6,10 @@
     android:layout_height="match_parent"
     tools:context="fr.eove.android.bluetooth.app.DeviceActivity">
 
+    <EditText
+        android:id="@+id/deviceLog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textMultiLine" />
 </android.support.constraint.ConstraintLayout>

@@ -12,7 +12,7 @@ import io.reactivex.ObservableOnSubscribe;
 
 public class BluetoothConnection {
 
-    private static final String TAG = BluetoothConnection.class.getName();
+    private static final String TAG = "Connection";
     private BluetoothSocket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
@@ -21,7 +21,7 @@ public class BluetoothConnection {
 
     public BluetoothConnection(BluetoothSocket socket) throws Exception {
         if (socket == null) {
-            throw new InvalidParameterException("Bluetooth socket can't be null");
+            throw new InvalidParameterException("socket can't be null");
         }
 
         this.socket = socket;
@@ -32,7 +32,7 @@ public class BluetoothConnection {
 
             connected = true;
         } catch (IOException e) {
-            throw new Exception("Can't get stream from bluetooth socket");
+            throw new Exception("Can't get stream from socket");
         } finally {
             if (!connected) {
                 closeConnection();

@@ -67,9 +67,10 @@ public class BluetoothService extends Service {
             @Override
             public void accept(BluetoothDevice bluetoothDevice) throws Exception {
                 String address = bluetoothDevice.getAddress();
+                String name = bluetoothDevice.getName();
                 devices.add(bluetoothDevice);
-                Log.d(TAG, "Found device: " + address);
-                EventBus.getDefault().post(new DiscoveredDeviceEvent(address));
+                Log.d(TAG, "Found device: " + name + " (" + address + ")");
+                EventBus.getDefault().post(new DiscoveredDeviceEvent(address, name));
             }
         }));
 
