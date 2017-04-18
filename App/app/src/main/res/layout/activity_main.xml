@@ -16,8 +16,15 @@
         tools:layout_editor_absoluteX="0dp" />
 
     <Button
-        android:id="@+id/startStopDiscoveryBtn"
+        android:id="@+id/startDiscoveryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start" />
+
+    <Button
+        android:id="@+id/stopDiscoveryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop" />
+
 </android.support.constraint.ConstraintLayout>
