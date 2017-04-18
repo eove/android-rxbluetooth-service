@@ -3,6 +3,7 @@ package fr.eove.android.bluetooth.service;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +15,12 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
 import fr.eove.android.bluetooth.service.events.DiscoveryStartRequest;
@@ -27,14 +32,21 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 public class BluetoothService extends Service {
 
     private static final String TAG = "Service";
+    static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter bluetoothAdapter;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable connectedDeviceDisposable;
     private List<BluetoothDevice> devices = new ArrayList<>();
+    private InputStream connectedInputStream;
+    private OutputStream connectedOutputStream;
+    private BluetoothConnection currentConnection;
 
     public BluetoothService() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -85,6 +97,29 @@ public class BluetoothService extends Service {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     public void onDeviceConnectRequest(DeviceConnectRequest event){
         Log.d(TAG, "requesting connection to " + event.address);
+        if (connectedDeviceDisposable != null) {
+            connectedDeviceDisposable.dispose();
+        }
+        observeConnectedDevice(bluetoothAdapter.getRemoteDevice(event.address), MY_UUID)
+                            .map(new Function<BluetoothSocket, BluetoothConnection>() {
+                                @Override
+                                public BluetoothConnection apply(BluetoothSocket bluetoothSocket) throws Exception {
+                                    currentConnection = new BluetoothConnection(bluetoothSocket);
+                                    return currentConnection;
+                                }
+                            })
+                            .flatMap(new Function<BluetoothConnection, Observable<Byte>>() {
+                                @Override
+                                public Observable<Byte> apply(BluetoothConnection bluetoothConnection) throws Exception {
+                                    return bluetoothConnection.observeByteStream();
+                                }
+                            })
+                            .subscribe(new Consumer<Byte>() {
+                                @Override
+                                public void accept(Byte recv) throws Exception {
+                                    Log.d(TAG, "recv: " + recv);
+                                }
+                            });
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
@@ -136,6 +171,22 @@ public class BluetoothService extends Service {
                     }
                 };
                 BluetoothService.this.registerReceiver(receiver, filter);
+            }
+        });
+    }
+
+    public Observable<BluetoothSocket> observeConnectedDevice(final BluetoothDevice bluetoothDevice, final UUID uuid) {
+
+        return Observable.create(new ObservableOnSubscribe<BluetoothSocket>() {
+            @Override
+            public void subscribe(ObservableEmitter<BluetoothSocket> e) throws Exception {
+                try {
+                    BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                    bluetoothSocket.connect();
+                    e.onNext(bluetoothSocket);
+                } catch (IOException error) {
+                    e.onError(error);
+                }
             }
         });
     }
