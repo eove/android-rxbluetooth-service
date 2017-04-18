@@ -7,9 +7,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="my-dev-1@iot.legrand.net"
+        android:text=""
         android:id="@+id/item_name"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:layout_alignParentTop="true"
         android:gravity="center_vertical|left" />
 

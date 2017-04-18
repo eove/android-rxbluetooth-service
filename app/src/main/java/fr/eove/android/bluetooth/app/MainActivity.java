@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
                 if (dev != null) {
                     startActivityForDevice(dev);
                 } else {
-                    Toast.makeText(MainActivity.this, "Could not open device activity", Toast.LENGTH_LONG);
+                    Toast.makeText(MainActivity.this, "Could not open device activity", Toast.LENGTH_LONG).show();
                 }
             }
         });
