@@ -34,6 +34,7 @@ public class MainActivity extends Activity {
     private Button startDiscoveryButton;
     private Button stopDiscoveryButton;
     private List<String> deviceAddresses = new ArrayList<>();
+    ArrayAdapter<String> deviceListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +74,8 @@ public class MainActivity extends Activity {
             }
         });
 
-        ArrayAdapter<String> adapter = new DeviceListAdapter();
-        list.setAdapter(adapter);
+        deviceListAdapter = new DeviceListAdapter();
+        list.setAdapter(deviceListAdapter);
     }
 
     private class DeviceListAdapter extends ArrayAdapter<String> {
@@ -114,11 +115,14 @@ public class MainActivity extends Activity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDiscoveredDeviceEvent(DiscoveredDeviceEvent event) {
         deviceAddresses.add(event.address);
+        deviceListAdapter.notifyDataSetChanged();
         Log.d(TAG, "Found device with address " + event.address);
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDiscoveryStatusEvent(DiscoveryStatusEvent event) {
+
         if (event.status.equals(DiscoveryStatus.STARTED)) {
             Log.d(TAG, "discovery started!");
             startDiscoveryButton.setEnabled(false);
