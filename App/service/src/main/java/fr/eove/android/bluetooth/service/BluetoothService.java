@@ -3,6 +3,7 @@ package fr.eove.android.bluetooth.service;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,12 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -21,8 +28,8 @@ public class BluetoothService extends Service {
 
     private static final String TAG = "BluetoothService";
     private BluetoothAdapter bluetoothAdapter;
-    Disposable deviceDisposables;
-    CompositeDisposable disposables;
+    private CompositeDisposable disposables = new CompositeDisposable();
+    private List<BluetoothDevice> devices = new ArrayList<>();
 
     public BluetoothService() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -41,7 +48,10 @@ public class BluetoothService extends Service {
         disposables.add(observeDevices().subscribe(new Consumer<BluetoothDevice>() {
             @Override
             public void accept(BluetoothDevice bluetoothDevice) throws Exception {
-                Log.d(TAG, "Found device: " + bluetoothDevice.getAddress());
+                String address = bluetoothDevice.getAddress();
+                devices.add(bluetoothDevice);
+                Log.d(TAG, "Found device: " + address);
+                EventBus.getDefault().post(new DiscoveredDeviceEvent(address));
             }
         }));
         startDiscovery();
@@ -50,7 +60,7 @@ public class BluetoothService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        disposables.dispose();
+        disposables.clear();
     }
 
     public boolean startDiscovery() {
