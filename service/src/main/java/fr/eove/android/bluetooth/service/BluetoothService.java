@@ -220,10 +220,21 @@ public class BluetoothService extends Service {
         return Observable.create(new ObservableOnSubscribe<BluetoothSocket>() {
             @Override
             public void subscribe(ObservableEmitter<BluetoothSocket> e) throws Exception {
+                BluetoothSocket bluetoothSocket;
+                String devName = bluetoothDevice.getName();
                 try {
-                    BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                    Log.d(TAG, "connecting to " + bluetoothDevice.getName() + "...");
+                    bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                    Log.d(TAG, "created socket");
+                } catch (Exception createError) {
+                    Log.e(TAG, "error when creating socket: " + createError.toString());
+                    bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
+                    Log.w(TAG, "created insecure socket");
+                }
+
+                try {
+                    Log.d(TAG, "connecting to " + devName + "...");
                     bluetoothSocket.connect();
+                    Log.d(TAG, "connected to: " + devName);
                     e.onNext(bluetoothSocket);
                 } catch (IOException error) {
                     Log.e(TAG, "failed to connect: " + error.toString());
