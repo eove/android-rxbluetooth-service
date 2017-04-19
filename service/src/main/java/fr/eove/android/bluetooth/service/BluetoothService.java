@@ -106,17 +106,41 @@ public class BluetoothService extends Service {
         disposables.clear();
     }
 
-    @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onDeviceConnectRequest(DeviceConnectRequest event){
-        Log.d(TAG, "requesting connection to " + event.address);
+    private boolean isAlreadyConnectedTo(String address) {
+        if (currentConnection != null) {
+            if (currentConnection.isConnected() && currentConnection.getAddress().equals(address)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void connectionCleanUps() {
         if (connectedDeviceDisposable != null) {
             connectedDeviceDisposable.dispose();
         }
-        connectedDeviceDisposable = observeConnectedDevice(bluetoothAdapter.getRemoteDevice(event.address), MY_UUID)
+        if (currentConnection != null) {
+            currentConnection.closeConnection();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onDeviceConnectRequest(DeviceConnectRequest event){
+        final String address = event.address;
+        Log.d(TAG, "requesting connection to " + address);
+
+        if (isAlreadyConnectedTo(address)) {
+            Log.d(TAG, "already connected to " + address);
+            return;
+        }
+
+        connectionCleanUps();
+
+        connectedDeviceDisposable = observeConnectedDevice(bluetoothAdapter.getRemoteDevice(address), MY_UUID)
                             .map(new Function<BluetoothSocket, BluetoothConnection>() {
                                 @Override
                                 public BluetoothConnection apply(BluetoothSocket bluetoothSocket) throws Exception {
-                                    currentConnection = new BluetoothConnection(bluetoothSocket);
+                                    currentConnection = new BluetoothConnection(address, bluetoothSocket);
                                     return currentConnection;
                                 }
                             })
@@ -130,6 +154,12 @@ public class BluetoothService extends Service {
                                 @Override
                                 public void accept(Byte recv) throws Exception {
                                     Log.d(TAG, "recv: " + recv);
+                                }
+                            }, new Consumer<Throwable>() {
+
+                                @Override
+                                public void accept(Throwable throwable) throws Exception {
+                                    Log.e(TAG, "Oooops: " + throwable.toString());
                                 }
                             });
         disposables.add(connectedDeviceDisposable);

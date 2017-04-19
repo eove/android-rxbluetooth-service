@@ -18,12 +18,13 @@ public class BluetoothConnection {
     private OutputStream outputStream;
     private Observable<Byte> mObserveInputStream;
     private boolean connected = false;
+    private String address = "";
 
-    public BluetoothConnection(BluetoothSocket socket) throws Exception {
+    public BluetoothConnection(String address, BluetoothSocket socket) throws Exception {
         if (socket == null) {
             throw new InvalidParameterException("socket can't be null");
         }
-
+        this.address = address;
         this.socket = socket;
 
         try {
@@ -38,6 +39,14 @@ public class BluetoothConnection {
                 closeConnection();
             }
         }
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
     public Observable<Byte> observeByteStream() {
