@@ -222,9 +222,11 @@ public class BluetoothService extends Service {
             public void subscribe(ObservableEmitter<BluetoothSocket> e) throws Exception {
                 try {
                     BluetoothSocket bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                    Log.d(TAG, "connecting to " + bluetoothDevice.getName() + "...");
                     bluetoothSocket.connect();
                     e.onNext(bluetoothSocket);
                 } catch (IOException error) {
+                    Log.e(TAG, "failed to connect: " + error.toString());
                     e.onError(error);
                 }
             }
