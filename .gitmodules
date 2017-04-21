@@ -1,3 +1,0 @@
-[submodule "service/RxBluetooth"]
-	path = service/RxBluetooth
-	url = git@github.com:eove/RxBluetooth.git
