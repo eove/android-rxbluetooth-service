@@ -16,10 +16,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -75,7 +73,8 @@ public class BluetoothService extends Service {
                     public void call(BluetoothDevice bluetoothDevice) {
                         String address = bluetoothDevice.getAddress();
                         String name = bluetoothDevice.getName();
-                        devices.put(address, bluetoothDevice);
+                        if (name.equals("")) name = "NO NAME";
+                        addDevice(bluetoothDevice);
                         Log.d(TAG, "Found device: " + name + " (" + address + ")");
                         EventBus.getDefault().post(new DiscoveredDeviceEvent(address, name));
                     }
@@ -100,6 +99,10 @@ public class BluetoothService extends Service {
 
         EventBus.getDefault().register(this);
         Log.d(TAG, "started service");
+    }
+
+    private void addDevice(BluetoothDevice device) {
+        devices.put(device.getAddress(), device);
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
