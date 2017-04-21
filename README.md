@@ -16,3 +16,10 @@ This service relies on a fork of [RxBluetooth](https://github.com/eove/RxBluetoo
 
 Communication with the service is done wih [EventBus](https://github.com/greenrobot/EventBus) to ensure a well decoupled architecture.
 
+## Demo app screenshots
+
+![Device discovery](./images/discovery.png?raw=true "Device discovery")
+
+![Device logs](./images/device_logs.png?raw=true "Device logs")
+
+
