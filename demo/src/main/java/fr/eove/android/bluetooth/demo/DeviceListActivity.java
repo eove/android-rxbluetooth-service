@@ -80,23 +80,23 @@ public class DeviceListActivity extends Activity {
     private class DeviceListAdapter extends ArrayAdapter<Device> {
 
         public DeviceListAdapter() {
-            super(DeviceListActivity.this, R.layout.item_view, devices);
+            super(DeviceListActivity.this, android.R.layout.simple_list_item_2, android.R.id.text1, devices);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            View itemView = convertView;
-            if (itemView == null) {
-                itemView = getLayoutInflater().inflate(R.layout.item_view, parent, false);
-            }
+            View view = super.getView(position, convertView, parent);
 
             Device dev = devices.get(position);
 
-            TextView textView = (TextView) itemView.findViewById(R.id.item_name);
-            textView.setText(dev.name + " (" + dev.address + ")");
+            TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+            TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
-            return itemView;
+            text1.setText(dev.name);
+            text2.setText(dev.address);
+
+            return view;
         }
     }
 

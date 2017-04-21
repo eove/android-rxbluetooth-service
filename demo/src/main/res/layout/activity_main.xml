@@ -6,14 +6,7 @@ android:layout_height="match_parent"
 android:orientation="vertical"
 tools:context="fr.eove.android.bluetooth.demo.DeviceListActivity">
 
-<android.support.v7.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    android:background="?attr/colorPrimary" />
-
-<FrameLayout
+    <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
