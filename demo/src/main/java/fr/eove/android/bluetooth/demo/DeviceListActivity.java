@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class DeviceListActivity extends Activity {
     private static final String TAG = "DeviceList Activity";
     private Button startDiscoveryButton;
     private Button stopDiscoveryButton;
+    private ProgressBar discoveryProgressBar;
     private List<Device> devices = new ArrayList<>();
     ArrayAdapter<Device> deviceListAdapter;
 
@@ -41,7 +43,7 @@ public class DeviceListActivity extends Activity {
         setContentView(R.layout.activity_main);
         startBluetoothService();
 
-        startDiscoveryButton = (Button) findViewById(R.id.startDiscoveryButton);
+        startDiscoveryButton = (Button) findViewById(R.id.start_discovery_button);
         startDiscoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,7 +53,7 @@ public class DeviceListActivity extends Activity {
         });
         startDiscoveryButton.setEnabled(true);
 
-        stopDiscoveryButton = (Button) findViewById(R.id.stopDiscoveryButton);
+        stopDiscoveryButton = (Button) findViewById(R.id.stop_discovery_button);
         stopDiscoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +62,9 @@ public class DeviceListActivity extends Activity {
         });
         stopDiscoveryButton.setEnabled(false);
 
-        ListView list =  (ListView) findViewById(R.id.deviceListView);
+        discoveryProgressBar = (ProgressBar) findViewById(R.id.discovery_progress_bar);
+
+        ListView list =  (ListView) findViewById(R.id.device_list_view);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -127,6 +131,7 @@ public class DeviceListActivity extends Activity {
             Log.d(TAG, "discovery started!");
             startDiscoveryButton.setEnabled(false);
             stopDiscoveryButton.setEnabled(true);
+            discoveryProgressBar.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -134,6 +139,7 @@ public class DeviceListActivity extends Activity {
             Log.d(TAG, "discovery cancelled!");
             stopDiscoveryButton.setEnabled(false);
             startDiscoveryButton.setEnabled(true);
+            discoveryProgressBar.setVisibility(View.GONE);
             return;
         }
 
@@ -141,6 +147,7 @@ public class DeviceListActivity extends Activity {
             Log.d(TAG, "discovery finished!");
             stopDiscoveryButton.setEnabled(false);
             startDiscoveryButton.setEnabled(true);
+            discoveryProgressBar.setVisibility(View.GONE);
             return;
         }
     }

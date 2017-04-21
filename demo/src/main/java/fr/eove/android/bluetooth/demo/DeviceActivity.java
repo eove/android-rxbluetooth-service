@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -13,7 +14,9 @@ public class DeviceActivity extends Activity {
 
     private static final String TAG = "Device Activity";
     private String address;
-    private  EditText logWindow;
+    private String name;
+    private  TextView logWindow;
+    private TextView idView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +24,13 @@ public class DeviceActivity extends Activity {
         setContentView(R.layout.activity_device);
         Bundle b = getIntent().getExtras();
         address = b.getString("address");
-        Log.d(TAG, "started activity for " + address);
-        logWindow = (EditText) findViewById(R.id.deviceLog);
+        name = b.getString("name");
+
+        logWindow = (TextView) findViewById(R.id.log_window);
+        idView = (TextView) findViewById(R.id.device_id);
+        idView.setText(name + " - " + address);
+
+        Log.d(TAG, "started activity for " + name + "(" + address + ")");
     }
 
     private void connectToDevice() {
