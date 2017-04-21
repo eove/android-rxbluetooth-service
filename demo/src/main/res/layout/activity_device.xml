@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="458dp"
         android:orientation="vertical">
 
         <TextView
@@ -24,39 +24,41 @@
         <TextView
             android:id="@+id/log_window"
             android:layout_width="match_parent"
-            android:layout_height="390dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_weight="19.45"
             android:ems="10"
-            android:maxLines="20"
+            android:maxLines="40"
             android:scrollbars="vertical" />
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_gravity="bottom"
+        android:orientation="horizontal"
         android:padding="@dimen/buttons_padding">
 
         <Button
-            android:id="@+id/start_log"
+            android:id="@+id/log_startstop_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|left"
             android:layout_weight="1"
-            android:background="@color/colorInactive"
+            android:background="@color/colorPrimary"
             android:enabled="true"
             android:text="@string/start_log"
             android:textColor="@android:color/white" />
 
         <Button
-            android:id="@+id/stop_log"
+            android:id="@+id/log_clear_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_weight="1"
-            android:background="@color/colorAccent"
+            android:background="@color/colorActive"
             android:enabled="true"
-            android:text="@string/stop_log"
+            android:text="@string/clear_log"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

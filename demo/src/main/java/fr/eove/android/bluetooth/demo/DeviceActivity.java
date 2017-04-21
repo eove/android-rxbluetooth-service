@@ -2,17 +2,16 @@ package fr.eove.android.bluetooth.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.text.Normalizer;
 import java.util.Formatter;
 
 import fr.eove.android.bluetooth.service.events.DeviceConnectRequest;
@@ -27,8 +26,8 @@ public class DeviceActivity extends Activity {
 
     private  TextView logWindow;
     private TextView idView;
-    private Button startLogButton;
-    private Button stopLogButton;
+    private Button logStartStopButton;
+    private Button logClearButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +38,29 @@ public class DeviceActivity extends Activity {
         name = b.getString("name");
 
         logWindow = (TextView) findViewById(R.id.log_window);
+        logWindow.setMovementMethod(new ScrollingMovementMethod());
+
         idView = (TextView) findViewById(R.id.device_id);
         idView.setText(name + " - " + address);
 
-        startLogButton = (Button) findViewById(R.id.start_log);
-        startLogButton.setOnClickListener(new View.OnClickListener() {
+        logStartStopButton = (Button) findViewById(R.id.log_startstop_button);
+        logStartStopButton.setText(getResources().getString(R.string.start_log));
+        logStartStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLogging();
+                if (isLoggingStarted()) {
+                    stopLoggingAndUpdateUI();
+                } else {
+                    startLoggingAndUpdateUI();
+                }
             }
         });
 
-        stopLogButton = (Button) findViewById(R.id.stop_log);
-        stopLogButton.setOnClickListener(new View.OnClickListener() {
+        logClearButton = (Button) findViewById(R.id.log_clear_button);
+        logClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopLogging();
+                logWindow.setText("");
             }
         });
 
@@ -62,11 +68,15 @@ public class DeviceActivity extends Activity {
         Log.d(TAG, "created activity for " + name + "(" + address + ")");
     }
 
-    private void startLogging() {
+    private void startLoggingAndUpdateUI() {
+        logStartStopButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        logStartStopButton.setText(getResources().getString(R.string.stop_log));
         isLogging = true;
     }
 
-    private void stopLogging() {
+    private void stopLoggingAndUpdateUI() {
+        logStartStopButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        logStartStopButton.setText(getResources().getString(R.string.start_log));
         isLogging = false;
     }
 
