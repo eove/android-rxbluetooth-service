@@ -31,9 +31,11 @@ import fr.eove.android.bluetooth.service.events.DiscoveryCancelRequest;
 public class DeviceListActivity extends Activity {
 
     private static final String TAG = "DeviceList Activity";
-    private Button startDiscoveryButton;
-    private Button stopDiscoveryButton;
+
+    private Button discoveryButton;
     private ProgressBar discoveryProgressBar;
+    private boolean isDiscoveryStarted = false;
+
     private List<Device> devices = new ArrayList<>();
     ArrayAdapter<Device> deviceListAdapter;
 
@@ -43,24 +45,20 @@ public class DeviceListActivity extends Activity {
         setContentView(R.layout.activity_main);
         startBluetoothService();
 
-        startDiscoveryButton = (Button) findViewById(R.id.start_discovery_button);
-        startDiscoveryButton.setOnClickListener(new View.OnClickListener() {
+        discoveryButton = (Button) findViewById(R.id.discovery_button);
+        discoveryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                devices.clear();
-                startDiscovery();
+                if (! isDiscoveryStarted) {
+                    isDiscoveryStarted = true;
+                    devices.clear();
+                    startDiscovery();
+                } else {
+                    isDiscoveryStarted = false;
+                    cancelDiscovery();
+                }
             }
         });
-        startDiscoveryButton.setEnabled(true);
-
-        stopDiscoveryButton = (Button) findViewById(R.id.stop_discovery_button);
-        stopDiscoveryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelDiscovery();
-            }
-        });
-        stopDiscoveryButton.setEnabled(false);
 
         discoveryProgressBar = (ProgressBar) findViewById(R.id.discovery_progress_bar);
 
@@ -129,27 +127,34 @@ public class DeviceListActivity extends Activity {
 
         if (event.status.equals(DiscoveryStatus.STARTED)) {
             Log.d(TAG, "discovery started!");
-            startDiscoveryButton.setEnabled(false);
-            stopDiscoveryButton.setEnabled(true);
-            discoveryProgressBar.setVisibility(View.VISIBLE);
+            updateUIonDiscoveryStarted();
             return;
         }
 
         if (event.status.equals(DiscoveryStatus.CANCELLED)) {
             Log.d(TAG, "discovery cancelled!");
-            stopDiscoveryButton.setEnabled(false);
-            startDiscoveryButton.setEnabled(true);
-            discoveryProgressBar.setVisibility(View.GONE);
+            updateUIonDiscoveryFinished();
             return;
         }
 
         if (event.status.equals(DiscoveryStatus.FINISHED)) {
             Log.d(TAG, "discovery finished!");
-            stopDiscoveryButton.setEnabled(false);
-            startDiscoveryButton.setEnabled(true);
-            discoveryProgressBar.setVisibility(View.GONE);
+            updateUIonDiscoveryFinished();
+
             return;
         }
+    }
+
+    private void updateUIonDiscoveryFinished() {
+        discoveryButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        discoveryButton.setText(getResources().getText(R.string.start_dis));
+        discoveryProgressBar.setVisibility(View.GONE);
+    }
+
+    private void updateUIonDiscoveryStarted() {
+        discoveryButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        discoveryButton.setText(getResources().getText(R.string.stop_dis));
+        discoveryProgressBar.setVisibility(View.VISIBLE);
     }
 
     public void startDiscovery() {

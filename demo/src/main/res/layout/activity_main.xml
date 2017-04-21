@@ -4,7 +4,7 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:orientation="vertical"
-tools:context="fr.eove.android.bluetooth.demo.DeviceListActivity">
+tools:context=".DeviceListActivity">
 
     <FrameLayout
     android:layout_width="match_parent"
@@ -13,10 +13,7 @@ tools:context="fr.eove.android.bluetooth.demo.DeviceListActivity">
         <ListView
         android:id="@+id/device_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-
-        </ListView>
+        android:layout_height="match_parent" />
 
         <ProgressBar
             android:id="@+id/discovery_progress_bar"
@@ -33,23 +30,15 @@ tools:context="fr.eove.android.bluetooth.demo.DeviceListActivity">
         android:padding="@dimen/buttons_padding">
 
         <Button
-            android:id="@+id/start_discovery_button"
+            android:id="@+id/discovery_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|left"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorInactive"
-            android:textColor="@android:color/white"
-            android:text="@string/start_dis" />
+            android:background="@color/colorPrimary"
+            android:text="@string/start_dis"
+            android:textColor="@android:color/white" />
 
-        <Button
-            android:id="@+id/stop_discovery_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorAccent"
-            android:textColor="@android:color/white"
-            android:text="@string/stop_dis" />
     </LinearLayout>
 </FrameLayout>
 </LinearLayout>
