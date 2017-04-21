@@ -1,5 +1,7 @@
 # Android RxBluetooth Service
 
+[![Build Status](https://travis-ci.org/eove/android-rxbluetooth-service.svg?branch=master)](https://travis-ci.org/eove/android-rxbluetooth-service)
+
 This lib provides an android service which handles the communication with bluetooth enabled devices. A demo app is also provided to show how to integrate this service into your code. The **Rx** stands for ReactiveX as this service is based on the [Ivan Baranov's RxBluetooth](https://github.com/IvBaranov/RxBluetooth/) library.
 
 ## Build
