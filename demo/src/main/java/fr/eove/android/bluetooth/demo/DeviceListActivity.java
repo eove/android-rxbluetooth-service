@@ -140,7 +140,6 @@ public class DeviceListActivity extends Activity {
         if (event.status.equals(DiscoveryStatus.FINISHED)) {
             Log.d(TAG, "discovery finished!");
             updateUIonDiscoveryFinished();
-
             return;
         }
     }
