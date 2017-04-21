@@ -16,6 +16,7 @@ import java.util.Formatter;
 
 import fr.eove.android.bluetooth.service.events.DeviceConnectRequest;
 import fr.eove.android.bluetooth.service.events.DeviceData;
+import fr.eove.android.bluetooth.service.events.DeviceDisconnectRequest;
 
 public class DeviceActivity extends Activity {
 
@@ -64,7 +65,6 @@ public class DeviceActivity extends Activity {
             }
         });
 
-        connectToDevice();
         Log.d(TAG, "created activity for " + name + "(" + address + ")");
     }
 
@@ -88,6 +88,9 @@ public class DeviceActivity extends Activity {
         EventBus.getDefault().post(new DeviceConnectRequest(address));
     }
 
+    private void disconnectFromDevice() {
+        EventBus.getDefault().post(new DeviceDisconnectRequest());
+    }
     private String deviceDataToString(byte[] data) {
         Formatter formatter = new Formatter();
         for (byte b : data) {
@@ -105,14 +108,16 @@ public class DeviceActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         EventBus.getDefault().register(this);
+        connectToDevice();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         EventBus.getDefault().unregister(this);
+        disconnectFromDevice();
     }
 }

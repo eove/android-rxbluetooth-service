@@ -120,6 +120,14 @@ public class BluetoothService extends Service {
         installConnectionHandlerFor(address);
     }
 
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onDeviceDisonnectRequest(DeviceConnectRequest event) {
+
+        if (currentConnection != null) {
+            currentConnection.closeConnection();
+        }
+    }
+
     private boolean isDeviceKnown(String address) {
         return devices.containsKey(address);
     }
