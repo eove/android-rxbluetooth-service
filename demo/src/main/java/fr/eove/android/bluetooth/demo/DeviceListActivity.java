@@ -118,27 +118,22 @@ public class DeviceListActivity extends Activity {
     public void onDiscoveredDeviceEvent(DiscoveredDeviceEvent event) {
         devices.add(new Device(event.address, event.name));
         deviceListAdapter.notifyDataSetChanged();
-        Log.d(TAG, "Found device with address " + event.address);
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDiscoveryStatusEvent(DiscoveryStatusEvent event) {
 
         if (event.status.equals(DiscoveryStatus.STARTED)) {
-            Log.d(TAG, "discovery started!");
             updateUIonDiscoveryStarted();
             return;
         }
 
         if (event.status.equals(DiscoveryStatus.CANCELLED)) {
-            Log.d(TAG, "discovery cancelled!");
             updateUIonDiscoveryFinished();
             return;
         }
 
         if (event.status.equals(DiscoveryStatus.FINISHED)) {
-            Log.d(TAG, "discovery finished!");
             updateUIonDiscoveryFinished();
             return;
         }
@@ -157,12 +152,10 @@ public class DeviceListActivity extends Activity {
     }
 
     public void startDiscovery() {
-        Log.d(TAG, "Starting discovery...");
         EventBus.getDefault().post(new DiscoveryStartRequest());
     }
 
     public void cancelDiscovery() {
-        Log.d(TAG, "Stopping discovery...");
         EventBus.getDefault().post(new DiscoveryCancelRequest());
     }
 
@@ -170,13 +163,11 @@ public class DeviceListActivity extends Activity {
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        Log.d(TAG, "started activity");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
-        Log.d(TAG, "stopped activity");
     }
 }
