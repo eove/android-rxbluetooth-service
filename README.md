@@ -13,3 +13,4 @@ This lib provides an android service which handles the communication with blueto
 This service relies on a fork of [RxBluetooth](https://github.com/eove/RxBluetooth) which adds some features to the upstream lib.
 
 Communication with the service is done wih [EventBus](https://github.com/greenrobot/EventBus) to ensure a well decoupled architecture.
+
