@@ -23,6 +23,7 @@ import java.util.UUID;
 
 
 import fr.eove.android.bluetooth.service.events.DeviceConnectRequest;
+import fr.eove.android.bluetooth.service.events.DeviceData;
 import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
 import fr.eove.android.bluetooth.service.events.DiscoveryStartRequest;
 import fr.eove.android.bluetooth.service.events.DiscoveryStatus;
@@ -146,6 +147,7 @@ public class BluetoothService extends Service {
                                         @Override
                                         public void call(byte[] bytes) {
                                             Log.d(TAG, "rec: " + toString(bytes));
+                                            EventBus.getDefault().post(new DeviceData(bytes));
                                         }
 
                                         private String toString(byte[] bytes) {
