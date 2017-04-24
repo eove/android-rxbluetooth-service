@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import fr.eove.android.bluetooth.service.events.DeviceConnectRequest;
 import fr.eove.android.bluetooth.service.events.DeviceData;
+import fr.eove.android.bluetooth.service.events.DeviceDisconnectRequest;
 import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
 import fr.eove.android.bluetooth.service.events.DiscoveryStartRequest;
 import fr.eove.android.bluetooth.service.events.DiscoveryStatus;
@@ -121,7 +122,7 @@ public class BluetoothService extends Service {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onDeviceDisonnectRequest(DeviceConnectRequest event) {
+    public void onDeviceDisconnectRequest(DeviceDisconnectRequest event) {
 
         if (currentConnection != null) {
             currentConnection.closeConnection();
