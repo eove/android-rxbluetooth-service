@@ -5,4 +5,5 @@
     <string name="start_log">Start Log</string>
     <string name="stop_log">Stop Log</string>
     <string name="clear_log">Clear Log</string>
+    <string name="log_too_long_warning">Log reached max limit!</string>
 </resources>

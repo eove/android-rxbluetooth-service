@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -108,6 +109,7 @@ public class DeviceActivity extends Activity {
         }
 
         if (isLoggingSizeTooHigh()) {
+            Toast.makeText(this, getResources().getString(R.string.log_too_long_warning), Toast.LENGTH_LONG).show();
             logWindow.setText("");
         }
     }
