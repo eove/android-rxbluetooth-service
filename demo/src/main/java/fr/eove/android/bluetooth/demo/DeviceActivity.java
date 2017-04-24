@@ -117,15 +117,15 @@ public class DeviceActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         EventBus.getDefault().register(this);
         connectToDevice();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         EventBus.getDefault().unregister(this);
         disconnectFromDevice();
     }
