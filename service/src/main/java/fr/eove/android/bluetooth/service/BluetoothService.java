@@ -77,9 +77,12 @@ public class BluetoothService extends Service {
                     public void call(BluetoothDevice bluetoothDevice) {
                         String address = bluetoothDevice.getAddress();
                         String name = bluetoothDevice.getName();
+
+                        if (! isDeviceKnown(address)) {
+                            addDevice(bluetoothDevice);
+                        }
                         if (name.equals("")) name = "NO NAME";
-                        addDevice(bluetoothDevice);
-                        Log.d(TAG, "Found device: " + name + " (" + address + ")");
+                        Log.d(TAG, "found device: " + name + " (" + address + ")");
                         EventBus.getDefault().post(new DiscoveredDevice(address, name));
                     }
                 });
