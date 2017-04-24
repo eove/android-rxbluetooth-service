@@ -21,6 +21,7 @@ import fr.eove.android.bluetooth.service.events.DeviceDisconnectRequest;
 public class DeviceActivity extends Activity {
 
     private static final String TAG = "Device Activity";
+    private static final Integer LOG_WINDOW_MAX_SIZE = 5000;
     private String address;
     private String name;
     private boolean isLogging;
@@ -105,6 +106,14 @@ public class DeviceActivity extends Activity {
         if (isLoggingStarted()) {
             logWindow.append(deviceDataToString(data));
         }
+
+        if (isLoggingSizeTooHigh()) {
+            logWindow.setText("");
+        }
+    }
+
+    private boolean isLoggingSizeTooHigh() {
+        return logWindow.getText().length() >= LOG_WINDOW_MAX_SIZE;
     }
 
     @Override
