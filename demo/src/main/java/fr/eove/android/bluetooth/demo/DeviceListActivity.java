@@ -41,7 +41,7 @@ public class DeviceListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_device_list);
         startBluetoothService();
 
         discoveryButton = (Button) findViewById(R.id.discovery_button);
