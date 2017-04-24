@@ -39,6 +39,17 @@ tools:context=".DeviceListActivity">
                 android:text="@string/start_dis"
                 android:textColor="@android:color/white" />
 
+            <Button
+                android:id="@+id/discovery_clear_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:background="@color/colorActive"
+                android:enabled="true"
+                android:text="@string/clear_discovery"
+                android:textColor="@android:color/white" />
+
         </LinearLayout>
     </FrameLayout>
 </RelativeLayout>

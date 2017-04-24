@@ -32,6 +32,7 @@ public class DeviceListActivity extends Activity {
     private static final String TAG = "DeviceList Activity";
 
     private Button discoveryButton;
+    private Button discoveryClearButton;
     private ProgressBar discoveryProgressBar;
     private boolean isDiscoveryStarted = false;
 
@@ -50,7 +51,6 @@ public class DeviceListActivity extends Activity {
             public void onClick(View v) {
                 if (! isDiscoveryStarted) {
                     isDiscoveryStarted = true;
-                    devices.clear();
                     startDiscovery();
                 } else {
                     isDiscoveryStarted = false;
@@ -60,6 +60,15 @@ public class DeviceListActivity extends Activity {
         });
 
         discoveryProgressBar = (ProgressBar) findViewById(R.id.discovery_progress_bar);
+
+        discoveryClearButton = (Button) findViewById(R.id.discovery_clear_button);
+        discoveryClearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                devices.clear();
+                deviceListAdapter.notifyDataSetChanged();
+            }
+        });
 
         ListView list =  (ListView) findViewById(R.id.device_list_view);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -113,10 +122,19 @@ public class DeviceListActivity extends Activity {
         startService(i);
     }
 
+    private boolean isDeviceAlreadyKnown(String address) {
+        for (Device device: devices) {
+            if (device.address.equals(address)) return true;
+        }
+        return false;
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDiscoveredDeviceEvent(DiscoveredDevice event) {
-        devices.add(new Device(event.address, event.name));
-        deviceListAdapter.notifyDataSetChanged();
+        if (! isDeviceAlreadyKnown(event.address)) {
+            devices.add(new Device(event.address, event.name));
+            deviceListAdapter.notifyDataSetChanged();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
