@@ -1,10 +1,10 @@
 package fr.eove.android.bluetooth.service.events;
 
 
-public class DeviceConnectRequest {
+public class ConnectRequest {
     public final String address;
 
-    public DeviceConnectRequest(String address) {
+    public ConnectRequest(String address) {
         this.address = address;
     }
 }

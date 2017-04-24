@@ -1,10 +1,10 @@
 package fr.eove.android.bluetooth.service.events;
 
 
-public class DeviceData {
+public class ReceivedData {
     public final byte[] data;
 
-    public DeviceData(byte[] data) {
+    public ReceivedData(byte[] data) {
         this.data = data;
     }
 }

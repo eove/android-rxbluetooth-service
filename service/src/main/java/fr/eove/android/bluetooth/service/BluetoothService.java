@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.UUID;
 
 
-import fr.eove.android.bluetooth.service.events.DeviceConnectRequest;
-import fr.eove.android.bluetooth.service.events.DeviceData;
-import fr.eove.android.bluetooth.service.events.DeviceDisconnectRequest;
+import fr.eove.android.bluetooth.service.events.ConnectRequest;
+import fr.eove.android.bluetooth.service.events.ReceivedData;
+import fr.eove.android.bluetooth.service.events.DisconnectRequest;
 import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
 import fr.eove.android.bluetooth.service.events.DiscoveryStartRequest;
 import fr.eove.android.bluetooth.service.events.DiscoveryStatus;
@@ -110,8 +110,10 @@ public class BluetoothService extends Service {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onDeviceConnectRequest(DeviceConnectRequest event) {
+    public void onConnectRequest(ConnectRequest event) {
         final String address = event.address;
+
+        Log.d(TAG, "requesting connection to " + event.address);
 
         if ( ! isDeviceKnown(address)) {
             Log.e(TAG, "unknown device with address: " + address);
@@ -122,8 +124,9 @@ public class BluetoothService extends Service {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onDeviceDisconnectRequest(DeviceDisconnectRequest event) {
-
+    public void onDisconnectRequest(DisconnectRequest event) {
+        Log.d(TAG, "requesting disconnection...");
+        
         if (currentConnection != null) {
             currentConnection.closeConnection();
         }
@@ -156,7 +159,7 @@ public class BluetoothService extends Service {
                                         @Override
                                         public void call(byte[] bytes) {
                                             Log.d(TAG, "rec: " + toString(bytes));
-                                            EventBus.getDefault().post(new DeviceData(bytes));
+                                            EventBus.getDefault().post(new ReceivedData(bytes));
                                         }
 
                                         private String toString(byte[] bytes) {
@@ -190,6 +193,7 @@ public class BluetoothService extends Service {
         }
 
         unsubscribe(deviceSubscription);
+        unsubscribe(deviceConnectSubscription);
         unsubscribe(discoveryStartSubscription);
         unsubscribe(discoveryFinishSubscription);
         unsubscribe(currentConnectionSubscription);

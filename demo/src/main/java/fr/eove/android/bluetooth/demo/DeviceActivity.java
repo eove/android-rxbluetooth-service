@@ -14,9 +14,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Formatter;
 
-import fr.eove.android.bluetooth.service.events.DeviceConnectRequest;
-import fr.eove.android.bluetooth.service.events.DeviceData;
-import fr.eove.android.bluetooth.service.events.DeviceDisconnectRequest;
+import fr.eove.android.bluetooth.service.events.ConnectRequest;
+import fr.eove.android.bluetooth.service.events.ReceivedData;
+import fr.eove.android.bluetooth.service.events.DisconnectRequest;
 
 public class DeviceActivity extends Activity {
 
@@ -86,11 +86,11 @@ public class DeviceActivity extends Activity {
     }
 
     private void connectToDevice() {
-        EventBus.getDefault().post(new DeviceConnectRequest(address));
+        EventBus.getDefault().post(new ConnectRequest(address));
     }
 
     private void disconnectFromDevice() {
-        EventBus.getDefault().post(new DeviceDisconnectRequest());
+        EventBus.getDefault().post(new DisconnectRequest());
     }
     private String deviceDataToString(byte[] data) {
         Formatter formatter = new Formatter();
@@ -101,7 +101,7 @@ public class DeviceActivity extends Activity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDeviceData(DeviceData event) {
+    public void onDeviceData(ReceivedData event) {
         byte[] data = event.data;
         if (isLoggingStarted()) {
             logWindow.append(deviceDataToString(data));
