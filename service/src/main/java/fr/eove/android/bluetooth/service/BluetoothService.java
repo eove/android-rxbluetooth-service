@@ -25,10 +25,10 @@ import java.util.UUID;
 import fr.eove.android.bluetooth.service.events.ConnectRequest;
 import fr.eove.android.bluetooth.service.events.ReceivedData;
 import fr.eove.android.bluetooth.service.events.DisconnectRequest;
-import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
+import fr.eove.android.bluetooth.service.events.DiscoveredDevice;
 import fr.eove.android.bluetooth.service.events.DiscoveryStartRequest;
+import fr.eove.android.bluetooth.service.events.DiscoveryStatusValue;
 import fr.eove.android.bluetooth.service.events.DiscoveryStatus;
-import fr.eove.android.bluetooth.service.events.DiscoveryStatusEvent;
 import fr.eove.android.bluetooth.service.events.DiscoveryCancelRequest;
 import rx.Subscriber;
 import rx.Subscription;
@@ -80,7 +80,7 @@ public class BluetoothService extends Service {
                         if (name.equals("")) name = "NO NAME";
                         addDevice(bluetoothDevice);
                         Log.d(TAG, "Found device: " + name + " (" + address + ")");
-                        EventBus.getDefault().post(new DiscoveredDeviceEvent(address, name));
+                        EventBus.getDefault().post(new DiscoveredDevice(address, name));
                     }
                 });
         discoveryStartSubscription = rxBluetooth.observeDiscovery()
@@ -88,7 +88,7 @@ public class BluetoothService extends Service {
                 .subscribe(new Action1<String>() {
                     @Override public void call(String action) {
                         Log.d(TAG, "starting discovery");
-                        EventBus.getDefault().post(new DiscoveryStatusEvent(DiscoveryStatus.STARTED));
+                        EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.STARTED));
                     }
                 });
 
@@ -97,7 +97,7 @@ public class BluetoothService extends Service {
                 .subscribe(new Action1<String>() {
                     @Override public void call(String action) {
                         Log.d(TAG, "finished discovery");
-                        EventBus.getDefault().post(new DiscoveryStatusEvent(DiscoveryStatus.FINISHED));
+                        EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.FINISHED));
                     }
                 });
 
@@ -126,7 +126,7 @@ public class BluetoothService extends Service {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     public void onDisconnectRequest(DisconnectRequest event) {
         Log.d(TAG, "requesting disconnection...");
-        
+
         if (currentConnection != null) {
             currentConnection.closeConnection();
         }
@@ -209,7 +209,7 @@ public class BluetoothService extends Service {
     public void onDiscoveryStopRequest(DiscoveryCancelRequest request){
         Log.d(TAG, "requesting discovery stop...");
         rxBluetooth.cancelDiscovery();
-        EventBus.getDefault().post(new DiscoveryStatusEvent(DiscoveryStatus.CANCELLED));
+        EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.CANCELLED));
     }
 
     private static void unsubscribe(Subscription subscription) {

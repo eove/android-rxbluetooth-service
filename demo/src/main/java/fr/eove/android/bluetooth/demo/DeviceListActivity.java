@@ -3,7 +3,6 @@ package fr.eove.android.bluetooth.demo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,10 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.eove.android.bluetooth.service.BluetoothService;
-import fr.eove.android.bluetooth.service.events.DiscoveredDeviceEvent;
+import fr.eove.android.bluetooth.service.events.DiscoveredDevice;
 import fr.eove.android.bluetooth.service.events.DiscoveryStartRequest;
+import fr.eove.android.bluetooth.service.events.DiscoveryStatusValue;
 import fr.eove.android.bluetooth.service.events.DiscoveryStatus;
-import fr.eove.android.bluetooth.service.events.DiscoveryStatusEvent;
 import fr.eove.android.bluetooth.service.events.DiscoveryCancelRequest;
 
 public class DeviceListActivity extends Activity {
@@ -115,25 +114,25 @@ public class DeviceListActivity extends Activity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDiscoveredDeviceEvent(DiscoveredDeviceEvent event) {
+    public void onDiscoveredDeviceEvent(DiscoveredDevice event) {
         devices.add(new Device(event.address, event.name));
         deviceListAdapter.notifyDataSetChanged();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDiscoveryStatusEvent(DiscoveryStatusEvent event) {
+    public void onDiscoveryStatusEvent(DiscoveryStatus event) {
 
-        if (event.status.equals(DiscoveryStatus.STARTED)) {
+        if (event.status.equals(DiscoveryStatusValue.STARTED)) {
             updateUIonDiscoveryStarted();
             return;
         }
 
-        if (event.status.equals(DiscoveryStatus.CANCELLED)) {
+        if (event.status.equals(DiscoveryStatusValue.CANCELLED)) {
             updateUIonDiscoveryFinished();
             return;
         }
 
-        if (event.status.equals(DiscoveryStatus.FINISHED)) {
+        if (event.status.equals(DiscoveryStatusValue.FINISHED)) {
             updateUIonDiscoveryFinished();
             return;
         }
