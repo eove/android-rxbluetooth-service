@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-
 import fr.eove.android.bluetooth.service.events.ConnectRequest;
 import fr.eove.android.bluetooth.service.events.ReceivedData;
 import fr.eove.android.bluetooth.service.events.DisconnectRequest;
@@ -108,8 +107,21 @@ public class BluetoothService extends Service {
         Log.d(TAG, "started service");
     }
 
-    private void addDevice(BluetoothDevice device) {
-        devices.put(device.getAddress(), device);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        EventBus.getDefault().unregister(this);
+
+        if (rxBluetooth != null) {
+            rxBluetooth.cancelDiscovery();
+        }
+
+        unsubscribe(deviceSubscription);
+        unsubscribe(deviceConnectSubscription);
+        unsubscribe(discoveryStartSubscription);
+        unsubscribe(discoveryFinishSubscription);
+        unsubscribe(currentConnectionSubscription);
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
@@ -133,6 +145,23 @@ public class BluetoothService extends Service {
         if (currentConnection != null) {
             currentConnection.closeConnection();
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onDiscoveryStartRequest(DiscoveryStartRequest request){
+        Log.d(TAG, "requesting discovery start...");
+        rxBluetooth.startDiscovery();
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onDiscoveryStopRequest(DiscoveryCancelRequest request){
+        Log.d(TAG, "requesting discovery stop...");
+        rxBluetooth.cancelDiscovery();
+        EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.CANCELLED));
+    }
+
+    private void addDevice(BluetoothDevice device) {
+        devices.put(device.getAddress(), device);
     }
 
     private boolean isDeviceKnown(String address) {
@@ -183,36 +212,6 @@ public class BluetoothService extends Service {
                         }
                     }
                 });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        EventBus.getDefault().unregister(this);
-
-        if (rxBluetooth != null) {
-            rxBluetooth.cancelDiscovery();
-        }
-
-        unsubscribe(deviceSubscription);
-        unsubscribe(deviceConnectSubscription);
-        unsubscribe(discoveryStartSubscription);
-        unsubscribe(discoveryFinishSubscription);
-        unsubscribe(currentConnectionSubscription);
-    }
-
-    @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onDiscoveryStartRequest(DiscoveryStartRequest request){
-        Log.d(TAG, "requesting discovery start...");
-        rxBluetooth.startDiscovery();
-    }
-
-    @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onDiscoveryStopRequest(DiscoveryCancelRequest request){
-        Log.d(TAG, "requesting discovery stop...");
-        rxBluetooth.cancelDiscovery();
-        EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.CANCELLED));
     }
 
     private static void unsubscribe(Subscription subscription) {

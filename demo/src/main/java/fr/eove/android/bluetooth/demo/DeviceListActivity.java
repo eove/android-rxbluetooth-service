@@ -87,46 +87,16 @@ public class DeviceListActivity extends Activity {
         list.setAdapter(deviceListAdapter);
     }
 
-    private class DeviceListAdapter extends ArrayAdapter<Device> {
-
-        public DeviceListAdapter() {
-            super(DeviceListActivity.this, android.R.layout.simple_list_item_2, android.R.id.text1, devices);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View view = super.getView(position, convertView, parent);
-
-            Device dev = devices.get(position);
-
-            TextView text1 = (TextView) view.findViewById(android.R.id.text1);
-            TextView text2 = (TextView) view.findViewById(android.R.id.text2);
-
-            text1.setText(dev.name);
-            text2.setText(dev.address);
-
-            return view;
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
     }
 
-    private void startActivityForDevice(Device dev) {
-        Intent i = new Intent(this, DeviceActivity.class);
-        i.putExtra("address", dev.address);
-        i.putExtra("name", dev.name);
-        startActivity(i);
-    }
-
-    private void startBluetoothService() {
-        Intent i = new Intent(this, BluetoothService.class);
-        startService(i);
-    }
-
-    private boolean isDeviceAlreadyKnown(String address) {
-        for (Device device: devices) {
-            if (device.address.equals(address)) return true;
-        }
-        return false;
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -168,23 +138,53 @@ public class DeviceListActivity extends Activity {
         discoveryProgressBar.setVisibility(View.VISIBLE);
     }
 
+    private class DeviceListAdapter extends ArrayAdapter<Device> {
+
+        public DeviceListAdapter() {
+            super(DeviceListActivity.this, android.R.layout.simple_list_item_2, android.R.id.text1, devices);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View view = super.getView(position, convertView, parent);
+
+            Device dev = devices.get(position);
+
+            TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+            TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+
+            text1.setText(dev.name);
+            text2.setText(dev.address);
+
+            return view;
+        }
+    }
+
+    private void startActivityForDevice(Device dev) {
+        Intent i = new Intent(this, DeviceActivity.class);
+        i.putExtra("address", dev.address);
+        i.putExtra("name", dev.name);
+        startActivity(i);
+    }
+
+    private void startBluetoothService() {
+        Intent i = new Intent(this, BluetoothService.class);
+        startService(i);
+    }
+
+    private boolean isDeviceAlreadyKnown(String address) {
+        for (Device device: devices) {
+            if (device.address.equals(address)) return true;
+        }
+        return false;
+    }
+    
     public void startDiscovery() {
         EventBus.getDefault().post(new DiscoveryStartRequest());
     }
 
     public void cancelDiscovery() {
         EventBus.getDefault().post(new DiscoveryCancelRequest());
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 }

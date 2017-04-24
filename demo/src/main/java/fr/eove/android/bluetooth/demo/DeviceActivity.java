@@ -23,6 +23,7 @@ public class DeviceActivity extends Activity {
 
     private static final String TAG = "Device Activity";
     private static final Integer LOG_WINDOW_MAX_SIZE = 5000;
+
     private String address;
     private String name;
     private boolean isLogging;
@@ -70,6 +71,41 @@ public class DeviceActivity extends Activity {
         Log.d(TAG, "created activity for " + name + "(" + address + ")");
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+        connectToDevice();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+        disconnectFromDevice();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeviceData(ReceivedData event) {
+        byte[] data = event.data;
+        if (isLoggingStarted()) {
+            logWindow.append(deviceDataToString(data));
+        }
+
+        if (isLoggingSizeTooHigh()) {
+            Toast.makeText(this, getResources().getString(R.string.log_too_long_warning), Toast.LENGTH_LONG).show();
+            logWindow.setText("");
+        }
+    }
+
+    private String deviceDataToString(byte[] data) {
+        Formatter formatter = new Formatter();
+        for (byte b : data) {
+            formatter.format("%02x", b);
+        }
+        return formatter.toString();
+    }
+
     private void startLoggingAndUpdateUI() {
         logStartStopButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         logStartStopButton.setText(getResources().getString(R.string.stop_log));
@@ -86,49 +122,15 @@ public class DeviceActivity extends Activity {
         return isLogging;
     }
 
+    private boolean isLoggingSizeTooHigh() {
+        return logWindow.getText().length() >= LOG_WINDOW_MAX_SIZE;
+    }
+
     private void connectToDevice() {
         EventBus.getDefault().post(new ConnectRequest(address));
     }
 
     private void disconnectFromDevice() {
         EventBus.getDefault().post(new DisconnectRequest());
-    }
-    private String deviceDataToString(byte[] data) {
-        Formatter formatter = new Formatter();
-        for (byte b : data) {
-            formatter.format("%02x", b);
-        }
-        return formatter.toString();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDeviceData(ReceivedData event) {
-        byte[] data = event.data;
-        if (isLoggingStarted()) {
-            logWindow.append(deviceDataToString(data));
-        }
-
-        if (isLoggingSizeTooHigh()) {
-            Toast.makeText(this, getResources().getString(R.string.log_too_long_warning), Toast.LENGTH_LONG).show();
-            logWindow.setText("");
-        }
-    }
-
-    private boolean isLoggingSizeTooHigh() {
-        return logWindow.getText().length() >= LOG_WINDOW_MAX_SIZE;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-        connectToDevice();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-        disconnectFromDevice();
     }
 }
