@@ -7,4 +7,8 @@ public class DiscoveryStatus {
     public DiscoveryStatus(DiscoveryStatusValue status) {
         this.status = status;
     }
+
+    public String toString() {
+        return status.toString();
+    }
 }
