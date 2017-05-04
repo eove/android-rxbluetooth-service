@@ -50,10 +50,8 @@ public class DeviceListActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (! isDiscoveryStarted) {
-                    isDiscoveryStarted = true;
                     startDiscovery();
                 } else {
-                    isDiscoveryStarted = false;
                     cancelDiscovery();
                 }
             }
@@ -76,6 +74,7 @@ public class DeviceListActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Device dev = devices.get(position);
                 if (dev != null) {
+                    cancelDiscovery();
                     startActivityForDevice(dev);
                 } else {
                     Toast.makeText(DeviceListActivity.this, "Could not open device activity", Toast.LENGTH_LONG).show();
@@ -111,16 +110,19 @@ public class DeviceListActivity extends Activity {
     public void onDiscoveryStatusEvent(DiscoveryStatus event) {
 
         if (event.status.equals(DiscoveryStatusValue.STARTED)) {
+            isDiscoveryStarted = true;
             updateUIonDiscoveryStarted();
             return;
         }
 
         if (event.status.equals(DiscoveryStatusValue.CANCELLED)) {
+            isDiscoveryStarted = false;
             updateUIonDiscoveryFinished();
             return;
         }
 
         if (event.status.equals(DiscoveryStatusValue.FINISHED)) {
+            isDiscoveryStarted = false;
             updateUIonDiscoveryFinished();
             return;
         }
