@@ -9,4 +9,8 @@ public class DiscoveredDevice {
         this.address = address;
         this.name = name;
     }
+
+    public String toString() {
+        return String.format("%s (%s)", name, address);
+    }
 }

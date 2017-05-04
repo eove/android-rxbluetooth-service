@@ -86,8 +86,8 @@ public class DeviceActivity extends Activity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDeviceData(ReceivedData event) {
-        byte[] data = event.data;
+    public void onDeviceData(ReceivedData receivedData) {
+        byte[] data = receivedData.payload;
         if (isLoggingStarted()) {
             logWindow.append(deviceDataToString(data));
         }

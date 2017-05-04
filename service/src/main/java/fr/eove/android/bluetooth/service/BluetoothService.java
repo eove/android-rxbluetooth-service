@@ -16,7 +16,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -81,7 +80,6 @@ public class BluetoothService extends Service {
                             addDevice(bluetoothDevice);
                         }
                         if (name.equals("")) name = "NO NAME";
-                        Log.d(TAG, "found device: " + name + " (" + address + ")");
                         EventBus.getDefault().post(new DiscoveredDevice(address, name));
                     }
                 });
@@ -89,7 +87,6 @@ public class BluetoothService extends Service {
                 .filter(Action.isEqualTo(BluetoothAdapter.ACTION_DISCOVERY_STARTED))
                 .subscribe(new Action1<String>() {
                     @Override public void call(String action) {
-                        Log.d(TAG, "starting discovery");
                         EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.STARTED));
                     }
                 });
@@ -98,7 +95,6 @@ public class BluetoothService extends Service {
                 .filter(Action.isEqualTo(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
                 .subscribe(new Action1<String>() {
                     @Override public void call(String action) {
-                        Log.d(TAG, "finished discovery");
                         EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.FINISHED));
                     }
                 });
@@ -125,10 +121,10 @@ public class BluetoothService extends Service {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onConnectRequest(ConnectRequest event) {
-        final String address = event.address;
+    public void onConnectRequest(ConnectRequest request) {
+        final String address = request.address;
 
-        Log.d(TAG, "requesting connection to " + event.address);
+        Log.d(TAG, "requesting connection to " + address);
 
         if ( ! isDeviceKnown(address)) {
             Log.e(TAG, "unknown device with address: " + address);
@@ -158,6 +154,21 @@ public class BluetoothService extends Service {
         Log.d(TAG, "requesting discovery stop...");
         rxBluetooth.cancelDiscovery();
         EventBus.getDefault().post(new DiscoveryStatus(DiscoveryStatusValue.CANCELLED));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDiscoveryStatus(DiscoveryStatus status) {
+        Log.d(TAG, "discovery status: " + status.toString());
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onReceivedData(ReceivedData data){
+        Log.d(TAG, "received: " + data.toString());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDiscoveredDeviceEvent(DiscoveredDevice device) {
+        Log.d(TAG, "found device: " + device.toString());
     }
 
     private void addDevice(BluetoothDevice device) {
@@ -190,16 +201,7 @@ public class BluetoothService extends Service {
                                     .subscribe(new Action1<byte[]>() {
                                         @Override
                                         public void call(byte[] bytes) {
-                                            Log.d(TAG, "rec: " + toString(bytes));
                                             EventBus.getDefault().post(new ReceivedData(bytes));
-                                        }
-
-                                        private String toString(byte[] bytes) {
-                                            Formatter formatter = new Formatter();
-                                            for (byte b : bytes) {
-                                                formatter.format("%02x", b);
-                                            }
-                                            return formatter.toString();
                                         }
                                     }, new Action1<Throwable>() {
                                         @Override
